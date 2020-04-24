@@ -94,43 +94,23 @@ return false
 
 本题不需要使用拓扑排序，只需要检测有向图是否存在环即可。
 
-```java
-public boolean canFinish(int numCourses, int[][] prerequisites) {
-    List<Integer>[] graphic = new List[numCourses];
-    for (int i = 0; i < numCourses; i++) {
-        graphic[i] = new ArrayList<>();
+```c++
+bool canFinish(int n, vector<pair<int, int>>& pre) {
+    vector<vector<int>> adj(n, vector<int>());
+    vector<int> degree(n, 0);
+    for (auto &p: pre) {
+        adj[p.second].push_back(p.first);
+        degree[p.first]++;
     }
-    for (int[] pre : prerequisites) {
-        graphic[pre[0]].add(pre[1]);
+    queue<int> q;
+    for (int i = 0; i < n; i++)
+        if (degree[i] == 0) q.push(i);
+    while (!q.empty()) {
+        int curr = q.front(); q.pop(); n--;
+        for (auto next: adj[curr])
+            if (--degree[next] == 0) q.push(next);
     }
-    boolean[] globalMarked = new boolean[numCourses];
-    boolean[] localMarked = new boolean[numCourses];
-    for (int i = 0; i < numCourses; i++) {
-        if (hasCycle(globalMarked, localMarked, graphic, i)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-private boolean hasCycle(boolean[] globalMarked, boolean[] localMarked,
-                         List<Integer>[] graphic, int curNode) {
-
-    if (localMarked[curNode]) {
-        return true;
-    }
-    if (globalMarked[curNode]) {
-        return false;
-    }
-    globalMarked[curNode] = true;
-    localMarked[curNode] = true;
-    for (int nextNode : graphic[curNode]) {
-        if (hasCycle(globalMarked, localMarked, graphic, nextNode)) {
-            return true;
-        }
-    }
-    localMarked[curNode] = false;
-    return false;
+    return n == 0;
 }
 ```
 
